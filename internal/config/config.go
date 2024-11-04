@@ -1,27 +1,17 @@
 package config
 
-import (
-	"os"
-
-	"gopkg.in/yaml.v3"
-)
+import "github.com/caarlos0/env/v6"
 
 type Config struct {
-	Server struct {
-		Address string `yaml:"address"`
-	} `yaml:"server"`
+	Port int    `env:"PORT" envDefault:"8080"`
+	Env  string `env:"ENV" envDefault:"dev"`
 }
 
-func Load(path string) (*Config, error) {
-	data, err := os.ReadFile(path)
-	if err != nil {
+func NewConfig() (*Config, error) {
+	var c = &Config{}
+	if err := env.Parse(c); err != nil {
 		return nil, err
 	}
 
-	var cfg Config
-	if err := yaml.Unmarshal(data, &cfg); err != nil {
-		return nil, err
-	}
-
-	return &cfg, nil
+	return c, nil
 }

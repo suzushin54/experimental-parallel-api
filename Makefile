@@ -8,3 +8,7 @@ proto:
 .PHONY: clean
 clean:
 	rm -f proto/*.go
+
+.PHONY: start
+start:
+	go run ./cmd/server/main.go
