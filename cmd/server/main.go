@@ -6,6 +6,7 @@ import (
 	"net"
 
 	"github.com/suzushin54/experimental-parallel-api/cmd/config"
+	"github.com/suzushin54/experimental-parallel-api/cmd/di"
 	"github.com/suzushin54/experimental-parallel-api/internal/infra/grpc_service"
 
 	"google.golang.org/grpc"
@@ -23,10 +24,13 @@ func main() {
 		log.Fatal("failed to listen on port:", err)
 	}
 
-	s := grpc.NewServer()
-	reflection.Register(s)
+	container := di.BuildContainer()
 
-	grpc_service.RegisterServices(s)
+	s := grpc.NewServer()
+	if err := grpc_service.RegisterServices(s, container); err != nil {
+		log.Fatalf("failed to register services: %v", err)
+	}
+	reflection.Register(s)
 
 	log.Printf("grpc_service listening on %s", lis.Addr())
 	if err := s.Serve(lis); err != nil {
