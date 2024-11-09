@@ -5,8 +5,8 @@ import (
 	"log"
 	"net"
 
-	"github.com/suzushin54/experimental-parallel-api/internal/config"
-	"github.com/suzushin54/experimental-parallel-api/internal/server"
+	"github.com/suzushin54/experimental-parallel-api/cmd/config"
+	"github.com/suzushin54/experimental-parallel-api/internal/infra/grpc_service"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -26,9 +26,9 @@ func main() {
 	s := grpc.NewServer()
 	reflection.Register(s)
 
-	server.RegisterServices(s)
+	grpc_service.RegisterServices(s)
 
-	log.Printf("server listening on %s", lis.Addr())
+	log.Printf("grpc_service listening on %s", lis.Addr())
 	if err := s.Serve(lis); err != nil {
 		log.Fatal("failed to serve:", err)
 	}
