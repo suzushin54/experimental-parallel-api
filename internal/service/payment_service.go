@@ -34,6 +34,16 @@ func (s *PaymentService) ProcessPayment(ctx context.Context, req *pb.PaymentRequ
 		}, nil
 	}
 
+	if err := s.paymentRepository.SaveTransaction(ctx, tx); err != nil {
+		log.Printf("Error saving payment transaction: %v", err)
+		return &pb.PaymentResponse{
+			Success:       false,
+			TransactionId: "",
+			Message:       "",
+			ErrorMessage:  err.Error(),
+		}, nil
+	}
+
 	log.Printf("Payment transaction created: %v", tx)
 
 	return &pb.PaymentResponse{
