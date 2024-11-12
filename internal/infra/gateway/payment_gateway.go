@@ -1,25 +1,27 @@
 package gateway
 
-import "context"
+import (
+	"context"
+	"github.com/suzushin54/experimental-parallel-api/internal/domain/model"
+	"log/slog"
+	"time"
+)
 
 type PaymentGateway interface {
-	ProcessPayment(ctx context.Context, userID string, amount float64) (bool, error)
+	ProcessPayment(ctx context.Context, ptx *model.PaymentTransaction) error
 }
 
-type paymentGateway struct {
-	amount   float64
-	currency string
-	method   string
+type paymentGateway struct{}
+
+func NewPaymentGateway() PaymentGateway {
+	return &paymentGateway{}
 }
 
-func NewPaymentGateway(amount float64, currency string, method string) PaymentGateway {
-	return &paymentGateway{
-		amount:   amount,
-		currency: currency,
-		method:   method,
-	}
-}
+func (pg *paymentGateway) ProcessPayment(ctx context.Context, ptx *model.PaymentTransaction) error {
+	slog.InfoContext(ctx, "Processing payment transaction: %v", ptx)
 
-func (pg *paymentGateway) ProcessPayment(ctx context.Context, userID string, amount float64) (bool, error) {
-	return true, nil
+	// simulate a long-running transaction
+	time.Sleep(800 * time.Millisecond)
+
+	return nil
 }
