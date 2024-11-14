@@ -18,6 +18,9 @@ func BuildContainer() *dig.Container {
 	}); err != nil {
 		log.Fatalf("failed to provide PaymentRepository: %v", err)
 	}
+	if err := c.Provide(gateway.NewIDaaSGateway); err != nil {
+		log.Fatalf("failed to provide IDaaS gateway: %v", err)
+	}
 	if err := c.Provide(gateway.NewPaymentGateway); err != nil {
 		log.Fatalf("failed to provide PaymentGateway: %v", err)
 	}
