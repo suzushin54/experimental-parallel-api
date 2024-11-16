@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package proto.payment.v1;
+
+option go_package = "gen/payment";
+
+service PaymentService {
+    rpc ProcessPayment(ProcessPaymentRequest) returns (ProcessPaymentResponse);
+}
+
+message ProcessPaymentRequest {
+    UserData user_data = 1;
+    PaymentData payment_data = 2;
+}
+
+message ProcessPaymentResponse {
+    bool success = 1;
+    string message = 2;
+    string error_message = 3;
+}
+
+message UserData {
+    string email = 1;
+    string password = 2;
+}
+
+message PaymentData {
+    double amount = 1;
+    string currency = 2;
+    string method = 3;
+}
