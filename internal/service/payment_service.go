@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 
-	pb "github.com/suzushin54/experimental-parallel-api/gen/payment"
+	pb "github.com/suzushin54/experimental-parallel-api/gen/payment/v1"
 	"github.com/suzushin54/experimental-parallel-api/internal/domain/model"
 	"github.com/suzushin54/experimental-parallel-api/internal/domain/repository"
 	"github.com/suzushin54/experimental-parallel-api/internal/infra/gateway"
@@ -31,29 +31,48 @@ func NewPaymentService(
 	}
 }
 
-func (s *PaymentService) ProcessPayment(ctx context.Context, req *pb.PaymentRequest) (*pb.PaymentResponse, error) {
+func (s *PaymentService) ProcessPayment(ctx context.Context, req *pb.ProcessPaymentRequest) (*pb.ProcessPaymentResponse, error) {
 	log.Printf("ProcessPayment request received: %v", req)
 
 	paymentID, err := uuid.NewV7()
 	if err != nil {
-		return nil, err
+		return makeErrorResponse("Failed to generate UUID v7", err)
 	}
 
-	ptx, err := model.NewPaymentTransaction(paymentID.String(), req.Amount, req.Currency, req.UserId, req.Method, "pending")
+	ptx, err := model.NewPaymentTransaction(paymentID.String(), req.PaymentData.Amount, req.PaymentData.Currency, req.PaymentData.Method)
 	if err != nil {
 		return makeErrorResponse("Transaction creation failed", err)
 	}
 
-	id, err := s.idaasGateway.RegisterAccount(ctx, req.UserId, req.UserId)
-	if err != nil {
-		return makeErrorResponse("Account registration failed", err)
+	errChan := make(chan error, 2)
+	var accountID string
+
+	go func() {
+		id, err := s.idaasGateway.RegisterAccount(ctx, req.UserData.Email, req.UserData.Password)
+		if err != nil {
+			errChan <- err
+			return
+		}
+		accountID = id
+		log.Printf("Account registered: %s", id)
+		errChan <- nil
+	}()
+
+	go func() {
+		if err := s.paymentGateway.ProcessPayment(ctx, ptx); err != nil {
+			errChan <- err
+			return
+		}
+		errChan <- nil
+	}()
+
+	for i := 0; i < 2; i++ {
+		if err := <-errChan; err != nil {
+			return makeErrorResponse("Transaction processing failed", err)
+		}
 	}
 
-	log.Printf("Account registered: %s", id)
-
-	if err := s.paymentGateway.ProcessPayment(ctx, ptx); err != nil {
-		return makeErrorResponse("Payment processing failed", err)
-	}
+	ptx.BindCustomerToTransaction(accountID)
 
 	if err := s.paymentRepository.SaveTransaction(ctx, ptx); err != nil {
 		return makeErrorResponse("Transaction saving failed", err)
@@ -61,20 +80,18 @@ func (s *PaymentService) ProcessPayment(ctx context.Context, req *pb.PaymentRequ
 
 	log.Printf("Payment transaction created: %v", ptx)
 
-	return &pb.PaymentResponse{
-		Success:       true,
-		TransactionId: ptx.ID,
-		Message:       "Payment processed successfully",
-		ErrorMessage:  "",
+	return &pb.ProcessPaymentResponse{
+		Success:      true,
+		Message:      "Payment processed successfully",
+		ErrorMessage: "",
 	}, nil
 }
 
-func makeErrorResponse(message string, err error) (*pb.PaymentResponse, error) {
+func makeErrorResponse(message string, err error) (*pb.ProcessPaymentResponse, error) {
 	log.Printf("%s: %v", message, err)
-	return &pb.PaymentResponse{
-		Success:       false,
-		TransactionId: "",
-		Message:       "",
-		ErrorMessage:  err.Error(),
+	return &pb.ProcessPaymentResponse{
+		Success:      false,
+		Message:      "",
+		ErrorMessage: err.Error(),
 	}, nil
 }

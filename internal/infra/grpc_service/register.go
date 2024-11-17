@@ -4,7 +4,7 @@ import (
 	"go.uber.org/dig"
 	"google.golang.org/grpc"
 
-	pb "github.com/suzushin54/experimental-parallel-api/gen/payment"
+	pb "github.com/suzushin54/experimental-parallel-api/gen/payment/v1"
 	"github.com/suzushin54/experimental-parallel-api/internal/service"
 )
 
