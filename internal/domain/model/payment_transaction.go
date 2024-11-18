@@ -1,7 +1,7 @@
 package model
 
 import (
-	"log"
+	"fmt"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -40,11 +40,11 @@ func NewPaymentTransaction(
 }
 
 // BindCustomerToTransaction binds a customer ID to a transaction
-func (pt *PaymentTransaction) BindCustomerToTransaction(cID string) {
+func (pt *PaymentTransaction) BindCustomerToTransaction(cID string) error {
 	if pt.CustomerID == nil {
 		pt.CustomerID = &cID
-		return
+		return nil
 	}
 
-	log.Fatalf("Customer ID already bound to transaction: %s", pt.CustomerID)
+	return fmt.Errorf("customer ID already bound to transaction: %s", *pt.CustomerID)
 }

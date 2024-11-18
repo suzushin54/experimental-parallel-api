@@ -72,7 +72,9 @@ func (s *PaymentService) ProcessPayment(ctx context.Context, req *pb.ProcessPaym
 		}
 	}
 
-	ptx.BindCustomerToTransaction(accountID)
+	if err := ptx.BindCustomerToTransaction(accountID); err != nil {
+		return makeErrorResponse("Transaction binding failed", err)
+	}
 
 	if err := s.paymentRepository.SaveTransaction(ctx, ptx); err != nil {
 		return makeErrorResponse("Transaction saving failed", err)
