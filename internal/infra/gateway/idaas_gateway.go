@@ -3,6 +3,7 @@ package gateway
 import (
 	"context"
 	"github.com/google/uuid"
+	"log"
 	"log/slog"
 	"time"
 )
@@ -29,6 +30,8 @@ func (i *IDaaSGateway) RegisterAccount(ctx context.Context, email, password stri
 		slog.ErrorContext(ctx, "Failed to generate UUID v7: %v", err)
 		return "", err
 	}
+
+	log.Default().Printf("Account registered, ID: %s", id)
 
 	// Simulate network delay
 	time.Sleep(500 * time.Millisecond)

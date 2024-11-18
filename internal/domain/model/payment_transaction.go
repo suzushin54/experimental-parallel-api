@@ -11,7 +11,7 @@ type PaymentTransaction struct {
 	ID            string  `validate:"required,uuid"`
 	Amount        float64 `validate:"required,gte=0"`
 	Currency      string  `validate:"required,oneof=USD EUR JPY"`
-	CustomerID    string  `validate:"uuid,omitempty"`
+	CustomerID    *string `validate:"omitempty,uuid"`
 	Status        string  `validate:"required,oneof=pending completed failed"`
 	PaymentMethod string  `validate:"required,oneof=credit debit paypal"`
 	CreatedAt     time.Time
@@ -41,8 +41,8 @@ func NewPaymentTransaction(
 
 // BindCustomerToTransaction binds a customer ID to a transaction
 func (pt *PaymentTransaction) BindCustomerToTransaction(cID string) {
-	if pt.CustomerID == "" {
-		pt.CustomerID = cID
+	if pt.CustomerID == nil {
+		pt.CustomerID = &cID
 		return
 	}
 
