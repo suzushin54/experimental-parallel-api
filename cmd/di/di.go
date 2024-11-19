@@ -24,8 +24,8 @@ func BuildContainer() *dig.Container {
 	if err := c.Provide(gateway.NewPaymentGateway); err != nil {
 		log.Fatalf("failed to provide PaymentGateway: %v", err)
 	}
-	if err := c.Provide(service.NewPaymentService); err != nil {
-		log.Fatalf("failed to provide PaymentService: %v", err)
+	if err := c.Provide(service.NewParallelPaymentService); err != nil {
+		log.Fatalf("failed to provide ParallelPaymentService: %v", err)
 	}
 
 	return c

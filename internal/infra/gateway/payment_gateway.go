@@ -2,9 +2,10 @@ package gateway
 
 import (
 	"context"
-	"github.com/suzushin54/experimental-parallel-api/internal/domain/model"
 	"log/slog"
 	"time"
+
+	"github.com/suzushin54/experimental-parallel-api/internal/domain/model"
 )
 
 type PaymentGateway interface {

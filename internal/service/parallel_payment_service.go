@@ -12,26 +12,26 @@ import (
 	"github.com/suzushin54/experimental-parallel-api/internal/infra/gateway"
 )
 
-type PaymentService struct {
+type ParallelPaymentService struct {
 	paymentRepository repository.PaymentRepository
 	paymentGateway    gateway.PaymentGateway
 	idaasGateway      gateway.IDaaSInterface
 	pb.UnimplementedPaymentServiceServer
 }
 
-func NewPaymentService(
+func NewParallelPaymentService(
 	pr repository.PaymentRepository,
 	pg gateway.PaymentGateway,
 	ig gateway.IDaaSInterface,
-) *PaymentService {
-	return &PaymentService{
+) *ParallelPaymentService {
+	return &ParallelPaymentService{
 		paymentRepository: pr,
 		paymentGateway:    pg,
 		idaasGateway:      ig,
 	}
 }
 
-func (s *PaymentService) ProcessPayment(ctx context.Context, req *pb.ProcessPaymentRequest) (*pb.ProcessPaymentResponse, error) {
+func (s *ParallelPaymentService) ProcessPayment(ctx context.Context, req *pb.ProcessPaymentRequest) (*pb.ProcessPaymentResponse, error) {
 	log.Printf("ProcessPayment request received: %v", req)
 
 	paymentID, err := uuid.NewV7()

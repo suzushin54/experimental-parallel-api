@@ -9,7 +9,7 @@ import (
 )
 
 func RegisterServices(s *grpc.Server, container *dig.Container) error {
-	return container.Invoke(func(paymentService *service.PaymentService) {
+	return container.Invoke(func(paymentService *service.ParallelPaymentService) {
 		pb.RegisterPaymentServiceServer(s, paymentService)
 	})
 }
