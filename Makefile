@@ -9,9 +9,14 @@ proto:
 clean:
 	@find ./gen -type f -name "*.go" -delete
 
-.PHONY: gen
-
-
 .PHONY: start
 start:
 	go run ./cmd/server/main.go
+
+.PHONY: bench-serial
+bench-serial:
+	cd internal/service && go test -bench=BenchmarkSerialPaymentService
+
+.PHONY: bench-parallel
+bench-parallel:
+	cd internal/service && go test -bench=BenchmarkParallelPaymentService
