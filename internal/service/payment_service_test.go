@@ -32,7 +32,7 @@ func BenchmarkSerialPaymentService(b *testing.B) {
 		PaymentData: &pb.PaymentData{
 			Amount:   1000,
 			Currency: "USD",
-			Method:   "card",
+			Method:   "credit",
 		},
 	}
 
@@ -57,7 +57,7 @@ func BenchmarkParallelPaymentService(b *testing.B) {
 		PaymentData: &pb.PaymentData{
 			Amount:   1000,
 			Currency: "USD",
-			Method:   "card",
+			Method:   "credit",
 		},
 	}
 
