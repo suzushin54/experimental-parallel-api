@@ -20,3 +20,7 @@ bench-serial:
 .PHONY: bench-parallel
 bench-parallel:
 	cd internal/service && go test -bench=BenchmarkParallelPaymentService
+
+.PHONY: bench
+bench:
+	cd internal/service && go test -bench . -benchmem -benchtime=10s -cpuprofile=cpu.prof -memprofile=mem.prof -blockprofile=block.prof

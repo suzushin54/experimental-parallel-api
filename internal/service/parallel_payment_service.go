@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/google/uuid"
-
 	pb "github.com/suzushin54/experimental-parallel-api/gen/payment/v1"
 	"github.com/suzushin54/experimental-parallel-api/internal/domain/model"
 	"github.com/suzushin54/experimental-parallel-api/internal/domain/repository"
@@ -32,8 +31,6 @@ func NewParallelPaymentService(
 }
 
 func (s *ParallelPaymentService) ProcessPayment(ctx context.Context, req *pb.ProcessPaymentRequest) (*pb.ProcessPaymentResponse, error) {
-	log.Printf("ProcessPayment request received: %v", req)
-
 	paymentID, err := uuid.NewV7()
 	if err != nil {
 		return makeErrorResponse("Failed to generate UUID v7", err)
@@ -54,7 +51,6 @@ func (s *ParallelPaymentService) ProcessPayment(ctx context.Context, req *pb.Pro
 			return
 		}
 		accountID = id
-		log.Printf("Account registered: %s", id)
 		errChan <- nil
 	}()
 
@@ -79,8 +75,6 @@ func (s *ParallelPaymentService) ProcessPayment(ctx context.Context, req *pb.Pro
 	if err := s.paymentRepository.SaveTransaction(ctx, ptx); err != nil {
 		return makeErrorResponse("Transaction saving failed", err)
 	}
-
-	log.Printf("Payment transaction created: %v", ptx)
 
 	return &pb.ProcessPaymentResponse{
 		Success:      true,

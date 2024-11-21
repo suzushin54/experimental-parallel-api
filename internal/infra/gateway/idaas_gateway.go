@@ -2,10 +2,10 @@ package gateway
 
 import (
 	"context"
-	"github.com/google/uuid"
-	"log"
 	"log/slog"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // IDaaSInterface defines the interface for interacting with an IDaaS provider.
@@ -23,7 +23,7 @@ func NewIDaaSGateway() IDaaSInterface {
 
 // RegisterAccount simulates registering a new account with an IDaaS provider.
 func (i *IDaaSGateway) RegisterAccount(ctx context.Context, email, password string) (string, error) {
-	slog.InfoContext(ctx, "Registering new account: %s", email)
+	slog.DebugContext(ctx, "Registering new account: %s", email)
 
 	id, err := uuid.NewV7()
 	if err != nil {
@@ -31,7 +31,7 @@ func (i *IDaaSGateway) RegisterAccount(ctx context.Context, email, password stri
 		return "", err
 	}
 
-	log.Default().Printf("Account registered, ID: %s", id)
+	slog.DebugContext(ctx, "Account registered, ID: %s", id)
 
 	// Simulate network delay
 	time.Sleep(500 * time.Millisecond)
