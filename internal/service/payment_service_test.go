@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	pb "github.com/suzushin54/experimental-parallel-api/gen/payment/v1"
+	"github.com/suzushin54/experimental-parallel-api/internal/infra/adapter"
 	"github.com/suzushin54/experimental-parallel-api/internal/infra/gateway"
 	repositoryImpl "github.com/suzushin54/experimental-parallel-api/internal/infra/repository"
 )
@@ -13,9 +14,10 @@ func setupServices() (*SerialPaymentService, *ParallelPaymentService) {
 	repo := repositoryImpl.NewMemoryPaymentRepository()
 	idaasGateway := gateway.NewIDaaSGateway()
 	paymentGateway := gateway.NewPaymentGateway()
+	mailer := adapter.NewMailer()
 
-	serialService := NewSerialPaymentService(repo, paymentGateway, idaasGateway)
-	parallelService := NewParallelPaymentService(repo, paymentGateway, idaasGateway)
+	serialService := NewSerialPaymentService(repo, paymentGateway, idaasGateway, mailer)
+	parallelService := NewParallelPaymentService(repo, paymentGateway, idaasGateway, mailer)
 
 	return serialService, parallelService
 }

@@ -4,8 +4,10 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+
 	pb "github.com/suzushin54/experimental-parallel-api/gen/payment/v1"
 	"github.com/suzushin54/experimental-parallel-api/internal/domain/model"
+	"github.com/suzushin54/experimental-parallel-api/internal/domain/port"
 	"github.com/suzushin54/experimental-parallel-api/internal/domain/repository"
 	"github.com/suzushin54/experimental-parallel-api/internal/infra/gateway"
 )
@@ -14,6 +16,7 @@ type SerialPaymentService struct {
 	paymentRepository repository.PaymentRepository
 	paymentGateway    gateway.PaymentGateway
 	idaasGateway      gateway.IDaaSInterface
+	mailer            port.Mailer
 	pb.UnimplementedPaymentServiceServer
 }
 
@@ -21,11 +24,13 @@ func NewSerialPaymentService(
 	pr repository.PaymentRepository,
 	pg gateway.PaymentGateway,
 	ig gateway.IDaaSInterface,
+	m port.Mailer,
 ) *SerialPaymentService {
 	return &SerialPaymentService{
 		paymentRepository: pr,
 		paymentGateway:    pg,
 		idaasGateway:      ig,
+		mailer:            m,
 	}
 }
 
@@ -55,6 +60,10 @@ func (s *SerialPaymentService) ProcessPayment(ctx context.Context, req *pb.Proce
 
 	if err = s.paymentRepository.SaveTransaction(ctx, ptx); err != nil {
 		return makeErrorResponse("Transaction saving failed", err)
+	}
+
+	if err = s.mailer.Send(ctx, req.UserData.Email, "Payment Confirmation", "Your payment has been processed successfully"); err != nil {
+		return makeErrorResponse("Email sending failed", err)
 	}
 
 	return &pb.ProcessPaymentResponse{
