@@ -19,7 +19,7 @@ func NewPaymentGateway() PaymentGateway {
 }
 
 func (pg *paymentGateway) ProcessPayment(ctx context.Context, ptx *model.PaymentTransaction) error {
-	slog.DebugContext(ctx, "Processing payment transaction: %v", ptx)
+	slog.DebugContext(ctx, "Processing payment transaction: %v", "ptx", ptx)
 
 	// simulate a long-running transaction
 	time.Sleep(800 * time.Millisecond)

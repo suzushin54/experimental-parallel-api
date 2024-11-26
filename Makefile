@@ -24,3 +24,7 @@ bench-parallel:
 .PHONY: bench
 bench:
 	cd internal/service && go test -bench . -benchmem -benchtime=10s -cpuprofile=cpu.prof -memprofile=mem.prof -blockprofile=block.prof
+
+.PHONY: test-race
+test-race:
+	go test -race ./...

@@ -23,15 +23,15 @@ func NewIDaaSGateway() IDaaSInterface {
 
 // RegisterAccount simulates registering a new account with an IDaaS provider.
 func (i *IDaaSGateway) RegisterAccount(ctx context.Context, email, password string) (string, error) {
-	slog.DebugContext(ctx, "Registering new account: %s", email)
+	slog.DebugContext(ctx, "Registering new account: %s", "email", email)
 
 	id, err := uuid.NewV7()
 	if err != nil {
-		slog.ErrorContext(ctx, "Failed to generate UUID v7: %v", err)
+		slog.ErrorContext(ctx, "Failed to generate UUID v7: %v", "err", err)
 		return "", err
 	}
 
-	slog.DebugContext(ctx, "Account registered, ID: %s", id)
+	slog.DebugContext(ctx, "Account registered, ID: %s", "id", id)
 
 	// Simulate network delay
 	time.Sleep(500 * time.Millisecond)
