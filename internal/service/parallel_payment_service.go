@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"log"
-	"sync"
 
 	"github.com/google/uuid"
 
@@ -47,19 +46,16 @@ func (s *ParallelPaymentService) ProcessPayment(ctx context.Context, req *pb.Pro
 		return makeErrorResponse("Transaction creation failed", err)
 	}
 
+	accountChan := make(chan string, 1)
 	errChan := make(chan error, 2)
-	var accountID string
-	var wg sync.WaitGroup
-	wg.Add(1)
 
 	go func() {
-		defer wg.Done()
 		id, err := s.idaasGateway.RegisterAccount(ctx, req.UserData.Email, req.UserData.Password)
 		if err != nil {
 			errChan <- err
 			return
 		}
-		accountID = id
+		accountChan <- id
 		errChan <- nil
 	}()
 
@@ -77,7 +73,8 @@ func (s *ParallelPaymentService) ProcessPayment(ctx context.Context, req *pb.Pro
 		}
 	}
 
-	wg.Wait()
+	close(accountChan)
+	accountID := <-accountChan
 	if err := ptx.BindCustomerToTransaction(accountID); err != nil {
 		return makeErrorResponse("Transaction binding failed", err)
 	}
