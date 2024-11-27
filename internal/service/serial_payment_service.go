@@ -37,33 +37,33 @@ func NewSerialPaymentService(
 func (s *SerialPaymentService) ProcessPayment(ctx context.Context, req *pb.ProcessPaymentRequest) (*pb.ProcessPaymentResponse, error) {
 	paymentID, err := uuid.NewV7()
 	if err != nil {
-		return makeErrorResponse("Failed to generate UUID v7", err)
+		return makeErrorResponse(ctx, "Failed to generate UUID v7", err)
 	}
 
 	ptx, err := model.NewPaymentTransaction(paymentID.String(), req.PaymentData.Amount, req.PaymentData.Currency, req.PaymentData.Method)
 	if err != nil {
-		return makeErrorResponse("Transaction creation failed", err)
+		return makeErrorResponse(ctx, "Transaction creation failed", err)
 	}
 
 	accountID, err := s.idaasGateway.RegisterAccount(ctx, req.UserData.Email, req.UserData.Password)
 	if err != nil {
-		return makeErrorResponse("Account registration failed", err)
+		return makeErrorResponse(ctx, "Account registration failed", err)
 	}
 
 	if err = s.paymentGateway.ProcessPayment(ctx, ptx); err != nil {
-		return makeErrorResponse("Payment processing failed", err)
+		return makeErrorResponse(ctx, "Payment processing failed", err)
 	}
 
 	if err = ptx.BindCustomerToTransaction(accountID); err != nil {
-		return makeErrorResponse("Transaction binding failed", err)
+		return makeErrorResponse(ctx, "Transaction binding failed", err)
 	}
 
 	if err = s.paymentRepository.SaveTransaction(ctx, ptx); err != nil {
-		return makeErrorResponse("Transaction saving failed", err)
+		return makeErrorResponse(ctx, "Transaction saving failed", err)
 	}
 
 	if err = s.mailer.Send(ctx, req.UserData.Email, "Payment Confirmation", "Your payment has been processed successfully"); err != nil {
-		return makeErrorResponse("Email sending failed", err)
+		return makeErrorResponse(ctx, "Email sending failed", err)
 	}
 
 	return &pb.ProcessPaymentResponse{
