@@ -10,4 +10,18 @@ services:
       EVENTSTORE_START_STANDARD_PROJECTIONS: "true"
       EVENTSTORE_HTTP_PORT: 2113
       EVENTSTORE_INSECURE: "true" # NOTE: insecure mode for development
-      EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP: "true"
+
+  app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: go_app
+    ports:
+      - "8080:8080"
+    environment:
+      APP_ENV: development
+      EVENTSTORE_URL: http://eventstore:2113
+    depends_on:
+      - eventstore
+    volumes:
+      - .:/app
