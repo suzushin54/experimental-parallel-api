@@ -1,0 +1,15 @@
+run:
+  timeout: 5m
+
+linters:
+  enable:
+    - errcheck
+    - govet
+    - gofmt
+    - gosimple
+    - staticcheck
+issues:
+  exclude-rules:
+    - path: cmd/server/main.go
+      linters:
+        - errcheck

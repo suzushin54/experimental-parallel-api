@@ -28,3 +28,6 @@ bench:
 .PHONY: test-race
 test-race:
 	go test -race ./...
+
+lint:
+	golangci-lint run ./...
