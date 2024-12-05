@@ -57,7 +57,7 @@ func (e *EventSourcedPaymentService) ProcessPayment(ctx context.Context, req *pb
 		return makeErrorResponse(ctx, "Failed to save initial event", err)
 	}
 
-	// TODO: implement each process triggered by the event
+	// TODO: implement each process
 
 	return &pb.ProcessPaymentResponse{
 		Success:      true,
