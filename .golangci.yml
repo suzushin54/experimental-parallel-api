@@ -8,8 +8,21 @@ linters:
     - gofmt
     - gosimple
     - staticcheck
+    - unused
+    - deadcode
+    - structcheck
+    - varcheck
+    - gocognit
+
+linters-settings:
+  gocognit:
+    min-complexity: 10
+
 issues:
   exclude-rules:
     - path: cmd/server/main.go
       linters:
         - errcheck
+
+output:
+  print-issued-lines: true
