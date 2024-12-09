@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 
 	pb "github.com/suzushin54/experimental-parallel-api/gen/payment/v1"
 	"github.com/suzushin54/experimental-parallel-api/internal/domain/port"
@@ -44,6 +45,11 @@ func (e *EventSourcedPaymentService) ProcessPayment(ctx context.Context, req *pb
 		return makeErrorResponse(ctx, "Failed to generate UUID v7", err)
 	}
 
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.UserData.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return makeErrorResponse(ctx, "Failed to hash password", err)
+	}
+
 	initialEvent := eventstore.Event{
 		ID:        uuid.NewString(),
 		Type:      "PaymentInitiated",
@@ -51,7 +57,7 @@ func (e *EventSourcedPaymentService) ProcessPayment(ctx context.Context, req *pb
 		Payload: map[string]interface{}{
 			"user": map[string]interface{}{
 				"email":    req.UserData.Email,
-				"password": req.UserData.Password, // TODO: need encryption
+				"password": hashedPassword,
 			},
 			"payment": map[string]interface{}{
 				"amount":   req.PaymentData.Amount,
